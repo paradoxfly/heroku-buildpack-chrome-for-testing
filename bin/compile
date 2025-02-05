@@ -55,7 +55,17 @@ else
 fi
 # The current version endpoint requires ALL CAPS.
 CHANNEL="$(echo -n "$channel" | awk '{ print toupper($0) }')"
-VERSION="$(curl --silent --show-error --fail --retry 3 --retry-connrefused --connect-timeout 10 "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHANNEL")"
+# VERSION="$(curl --silent --show-error --fail --retry 3 --retry-connrefused --connect-timeout 10 "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHANNEL")"
+
+# Use CHROME_VERSION if provided, otherwise fetch latest for the given channel
+if [ -f "$ENV_DIR/CHROME_VERSION" ]; then
+  VERSION=$(cat "$ENV_DIR/CHROME_VERSION")
+  echo "Using specified Chrome version: $VERSION" | indent
+else
+  VERSION="$(curl --silent --show-error --fail --retry 3 --retry-connrefused --connect-timeout 10 "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHANNEL")"
+  echo "Resolved $CHANNEL version $VERSION" | indent
+fi
+
 echo "Resolved $CHANNEL version $VERSION" | indent
 
 echo "Downloading Chrome" | indent
